@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+        <style>
+            table {
+                border: 2px black solid;
+            }
+            td {
+                border: 2px black solid;
+                width:60px;
+                height:60px;
+            }
+        </style>
+    </head>
+    <body>
+        <div>Whose Turn: <span id='turn'></span></div>
+        <table>
+            <tr>
+                <td id='square-0-0'></td>
+                <td id='square-0-1'></td>
+                <td id='square-0-2'></td>
+            </tr>
+            <tr>
+                <td id='square-1-0'></td>
+                <td id='square-1-1'></td>
+                <td id='square-1-2'></td>
+            </tr>
+            <tr>
+                <td id='square-2-0'></td>
+                <td id='square-2-1'></td>
+                <td id='square-2-2'></td>
+            </tr>
+        </table>
+        
+        <div id='winning-message'>
+            
+        </div>
+        <script>
+            // ENUMERATION of the possible states 
+            // convention for constant to be in upper cases
+            const EMPTY = 0;
+            const X = 1;
+            const Y = 2;
+            let hasWon = false;
+            // STATE OF THE GAME
+            let currentPlayer = X;
+            // board is to store the state 
+            let board = [
+                [EMPTY, EMPTY, EMPTY],
+                [EMPTY, EMPTY, EMPTY],
+                [EMPTY, EMPTY, EMPTY]
+            ];
+            
+            // All jQuery stuff goes inside here
+            $(function(){
+                
+                updateTurnMessage(currentPlayer);
+                
+                $('td').click(function(event) {
+                
+                    // extract out of the id <td> we just clicked
+                    let id = $(this).attr('id');
+                    console.log('id = ' + id);
+                    // split the id string by dash into an array
+                    let chunks = id.split('-');
+                    console.log(chunks);
+                    let row = chunks[1];
+                    let col = chunks[2];
+                    // Check if there's already something inside
+                    if (board[row][col] == EMPTY) {
+                        console.log("Empty square clicked");
+                          board[row][col] = currentPlayer;
+                          updateSquare(row, col, currentPlayer);
+                          
+                        // change the STATE VARIABLE currentPlayer
+                        // to reflect that the current player is now
+                        // the next player in line
+                        if (currentPlayer == X) {
+                            currentPlayer = Y;
+                        } else {
+                            currentPlayer = X;
+                        }
+                        
+                       updateTurnMessage(currentPlayer);
+                        
+                        // Check for wins in any rows
+                        for (let i=0; i < 3; i++)
+                        {
+                            if (board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
+                              updateWinningMessage( board[i][0]);
+                              hasWon = true;
+                            }
+                        }
+                        
+                        for (let i=0; i < 3; i++)
+                        {
+                            if (board[0][i] != EMPTY && board[0][i] == board[1][i] && board[1][i] == board[2][i])
+                            {
+                               updateWinningMessage( board[0][i]);
+                               hasWon = true;
+                            }
+                        }
+                        
+                        if (board[0][0] != EMPTY && board[0][0]==board[1][1] && board[1][1] == board[2][2])
+                        {
+                           updateWinningMessage( board[0][0]);
+                           hasWon = true;
+                        }
+                        
+                        if (board[0][2] != EMPTY && board[0][2] == board[1][1] && board[1][1] == board[2][0])
+                        {
+                            updateWinningMessage( board[0][2]);
+                            hasWon = true;
+                        }
+                        
+                        let totalEmptySquares = 0;
+                        for (let i =0; i < 3; i++)
+                        {
+                            for (let j=0; j <3; j++)
+                            {
+                                if (board[i][j] == EMPTY) {
+                                    totalEmptySquares++;
+                                }
+                            }
+                        }
+                        
+                        if (totalEmptySquares == 0 && hasWon == false){
+                            displayDrawMessage();
+                        }
+                        
+                        
+                    } else {
+                        alert("This square is already taken")
+                    }
+                
+                })
+                
+                function updateSquare(row, col, player)
+                {
+                    let currentSymbol = '';
+                    if (player == X) {
+                        currentSymbol = 'X'
+                    } else {
+                        currentSymbol = 'O'
+                    }
+                     $('#square-'+row+'-'+col).text(currentSymbol);
+                      
+                }
+                
+                function updateWinningMessage(player)
+                {
+                     let currentSymbol = '';
+                    if (player == X) {
+                        currentSymbol = 'X'
+                    } else {
+                        currentSymbol = 'O'
+                    }
+                     $('#winning-message').text("Player " + currentSymbol+ " has won!"); 
+                }
+                
+                function updateTurnMessage(p)
+                {
+                      let currentSymbol = '';
+                    if (p == X) {
+                        currentSymbol = 'X'
+                    } else {
+                        currentSymbol = 'O'
+                    }
+                     $('#turn').text(currentSymbol);
+                }
+            
+                function displayDrawMessage()
+                {
+                    $('#winning-message').text("Draw!");
+                }
+            
+            });
+        </script>
+    </body>
+</html>
